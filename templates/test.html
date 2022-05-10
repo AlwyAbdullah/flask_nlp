@@ -1,0 +1,13 @@
+{% if transcript != "" %}
+<div id="speechTranscriptContainer">
+    <h1>Text Summarization</h1>
+    <p id="speechText">{{ transcript }}</p>
+</div>
+{% endif %}
+
+{% if listTopic != "" %}
+<div id="listTopic">
+    <h1>Topic Modelling</h1>
+    <p id="speechText">{{ listTopic }}</p>
+</div>
+{% endif %}

@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.0/css/all.min.css"
+        integrity="sha512-10/jx2EXwxxWqCLX/hHth/vu2KY3jCF70dCQB8TSgNjbCVAC/8vai53GfMDrO2Emgwccf2pJqxct9ehpzG+MTw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" type="text/css" href="../static/styles/main.css">
+    <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js"
+        integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js"
+        integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous">
+    </script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js"
+        integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous">
+    </script>
+
+    <script src="../static/node_modules/progressbar.js/dist/progressbar.min.js"></script>
+
+    <title>Text Summarization Flask</title>
+</head>
+
+<body>
+
+    <div id="speechContainer" class="container text-white text-justify">
+        <div class="centered">
+            <h1 class="text-center mt-5">INSERT YOUR AUDIO FILE</h1>
+            <a href="{{ url_for('test') }}"></a>
+            <p class="text-center">Audio file must be wav</p>
+            <p class="text-center"><b>30 Minute audio 6 Minute Process</b></p>
+            <div id="container"></div>
+            <br><br>
+
+            <span id="duration"></span>
+            <form method="post" enctype="multipart/form-data">
+                <div class="custom-file">
+                    <input type="file" class="custom-file-input" id="customFile" name="file" accept="audio/wav"
+                        required>
+                    <label class="custom-file-label text-center" for="customFile">Choose file</label>
+                </div>
+                <div class="col-md-12 text-center mb-3">
+                    <button type="submit" class="btn btn-primary mt-3 btn-block" id="submitButton">Transcribe</button>
+                </div>
+                <!-- <input type="file" name="file"/>
+                <br>
+                <input type="submit" id="submitButton" value="Transcribe"/> -->
+            </form>
+
+            <div class="text-white">
+                {% if transcript != "" %}
+                <h1 class="text-center"><b>Text Summarization</b></h1>
+                <p class="text-justify">{{ transcript }}</p>
+                <form action="{{ url_for('downloadPDF') }}" method="post" class="text-white container">
+                    <div class="form-group">
+                        <label for="exampleFormControlInput1">Number of participant</label>
+                        <input type="text" class="form-control" name="member" id="member" value="">Number of members:
+                        (max.
+                        10)<br />
+                        <a href="#" class="btn btn-success" id="filldetails" onclick="addFields()">Fill Details</a>
+                    </div>
+                    <div class="form-row" id="member-field">
+
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="exampleFormControlInput1">Tanggal</label>
+                            <input type="date" class="form-control" id="exampleFormControlInput1" name="fordate"
+                                required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="exampleFormControlInput1">Tempat</label>
+                            <input type="text" class="form-control" id="exampleFormControlInput1" name="tempat"
+                                required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleFormControlTextarea1">Text Summarization</label>
+                        <textarea class="form-control" id="exampleFormControlTextarea1" name="formtextarea" rows="10"
+                            required>{{ transcript }}</textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary mt-3 btn-block" id="submitButton">download pdf</button>
+                </form>
+                {% endif %}
+
+                {% if listTopic %}
+                <div id="listTopic" class="text-center">
+                    <h1><b>Topic Modelling</b></h1>
+                    <p>Topic 1: {{ listTopic[0] }}</p>
+                    <p>Topic 2: {{ listTopic[1] }}</p>
+                    <p>Topic 3: {{ listTopic[2] }}</p>
+                    <p>Topic 4: {{ listTopic[3] }}</p>
+                    <p>Topic 5: {{ listTopic[4] }}</p>
+                    <p>Topic 6: {{ listTopic[5] }}</p>
+                    <p>Topic 7: {{ listTopic[6] }}</p>
+                    <p>Topic 8: {{ listTopic[7] }}</p>
+                    <p>Topic 9: {{ listTopic[8] }}</p>
+                    <p>Topic 10: {{ listTopic[9] }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        <!-- <h1>Upload new File</h1> -->
+    </div>
+
+    <script>
+        var duration = 0;
+        $('#customFile').on('change', function () {
+            //get the file name
+            var fileName = $(this).val();
+            //replace the "Choose a file" label
+            $(this).next('.custom-file-label').html(fileName);
+
+            // Obtain the uploaded file, you can change the logic if you are working with multiupload
+            var file = this.files[0];
+
+            // Create instance of FileReader
+            var reader = new FileReader();
+
+            // When the file has been succesfully read
+            reader.onload = function (event) {
+
+                // Create an instance of AudioContext
+                var audioContext = new(window.AudioContext || window.webkitAudioContext)();
+
+                // Asynchronously decode audio file data contained in an ArrayBuffer.
+                audioContext.decodeAudioData(event.target.result, function (buffer) {
+                    // Obtain the duration in seconds of the audio file (with milliseconds as well, a float value)
+                    duration = buffer.duration;
+
+                    // example 12.3234 seconds
+                    console.log("The duration of the song is of: " + duration + " seconds");
+                    // Alternatively, just display the integer value with
+                    // parseInt(duration)
+                    // 12 seconds
+                    console.log(duration);
+
+                    var bar = new ProgressBar.Line(container, {
+                    strokeWidth: 1,
+                    easing: 'easeInOut',
+                    duration: parseInt(duration) * 10,
+                    color: '#60aa3f',
+                    trailColor: '#eee',
+                    trailWidth: 4,
+                    svgStyle: {
+                        width: '100%',
+                        height: '100%'
+                    },
+                    text: {
+                        style: {
+                            // Text color.
+                            // Default: same as stroke color (options.color)
+                            color: '#999',
+                            position: 'absolute',
+                            right: '0',
+                            top: '30px',
+                            padding: 0,
+                            margin: 0,
+                            transform: null
+                        },
+                        autoStyleContainer: false
+                    },
+                    from: {
+                        color: '#FFEA82'
+                    },
+                    to: {
+                        color: '#ED6A5A'
+                    },
+                    step: (state, bar) => {
+                        bar.setText(Math.round(bar.value() * 100) + ' %');
+                    }
+                });
+
+                bar.animate(1.0); // Number from 0.0 to 1.0
+                });
+            };
+
+            // In case that the file couldn't be read
+            reader.onerror = function (event) {
+                console.error("An error ocurred reading the file: ", event);
+            };
+
+            // Read file as an ArrayBuffer, important !
+            reader.readAsArrayBuffer(file);
+        })
+        // progressbar.js@1.0.0 version is used
+        // Docs: http://progressbarjs.readthedocs.org/en/1.0.0/
+
+        // function getDuration(src, cb) {
+        //     var audio = new Audio();
+        //     $(audio).on("loadedmetadata", function(){
+        //         cb(audio.duration);
+        //     });
+        //     audio.src = src;
+        //     getDuration("./audio/2.mp3", function(length) {
+        //         console.log('I got length ' + length);
+        //         document.getElementById("duration").textContent = length;
+        //     });
+        // }
+        // Create a non-dom allocated Audio element
+        // Add a change event listener to the file input
+    </script>
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+        integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.min.js"
+        integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous">
+    </script>
+</body>
+
+</html>
