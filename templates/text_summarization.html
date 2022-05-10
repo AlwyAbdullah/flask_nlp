@@ -13,6 +13,7 @@
         integrity="sha512-10/jx2EXwxxWqCLX/hHth/vu2KY3jCF70dCQB8TSgNjbCVAC/8vai53GfMDrO2Emgwccf2pJqxct9ehpzG+MTw=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" type="text/css" href="../static/styles/main.css">
+    <script src="../static/styles/main.js"></script>
     <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js"
         integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous">
     </script>
@@ -36,15 +37,27 @@
             <a href="{{ url_for('test') }}"></a>
             <p class="text-center">Audio file must be wav</p>
             <p class="text-center"><b>30 Minute audio 6 Minute Process</b></p>
-            <div id="container"></div>
-            <br><br>
-
             <span id="duration"></span>
-            <form method="post" enctype="multipart/form-data">
+            <form method="post" enctype="multipart/form-data" onsubmit="progressBar()">
                 <div class="custom-file">
                     <input type="file" class="custom-file-input" id="customFile" name="file" accept="audio/wav"
                         required>
                     <label class="custom-file-label text-center" for="customFile">Choose file</label>
+                </div>
+                <br><br>
+                <div class="text-center">
+                    <div class="form-check text-center form-check-inline">
+                        <input class="form-check-input" type="radio" name="radio" id="radio1" value="Text Summarization" checked>
+                        <label class="form-check-label" for="flexRadioDefault1">
+                            Text Summarization
+                        </label>
+                    </div>
+                    <div class="form-check text-center form-check-inline">
+                        <input class="form-check-input" type="radio" name="radio" id="radio2" value="Topic Modelling">
+                        <label class="form-check-label" for="flexRadioDefault2">
+                            Topic Modelling
+                        </label>
+                    </div>
                 </div>
                 <div class="col-md-12 text-center mb-3">
                     <button type="submit" class="btn btn-primary mt-3 btn-block" id="submitButton">Transcribe</button>
@@ -53,6 +66,8 @@
                 <br>
                 <input type="submit" id="submitButton" value="Transcribe"/> -->
             </form>
+            <br>
+            <div id="container"></div>
 
             <div class="text-white">
                 {% if transcript != "" %}
@@ -61,9 +76,9 @@
                 <form action="{{ url_for('downloadPDF') }}" method="post" class="text-white container">
                     <div class="form-group">
                         <label for="exampleFormControlInput1">Number of participant</label>
-                        <input type="text" class="form-control" name="member" id="member" value="">Number of members:
-                        (max.
-                        10)<br />
+                        <input type="text" class="form-control" name="member" id="member" value="">Number of
+                        members:(max.10)
+                        <br>
                         <a href="#" class="btn btn-success" id="filldetails" onclick="addFields()">Fill Details</a>
                     </div>
                     <div class="form-row" id="member-field">
@@ -140,45 +155,7 @@
                     // Alternatively, just display the integer value with
                     // parseInt(duration)
                     // 12 seconds
-                    console.log(duration);
-
-                    var bar = new ProgressBar.Line(container, {
-                        strokeWidth: 1,
-                        easing: 'easeInOut',
-                        duration: parseInt(duration) * 10,
-                        color: '#60aa3f',
-                        trailColor: '#eee',
-                        trailWidth: 4,
-                        svgStyle: {
-                            width: '100%',
-                            height: '100%'
-                        },
-                        text: {
-                            style: {
-                                // Text color.
-                                // Default: same as stroke color (options.color)
-                                color: '#999',
-                                position: 'absolute',
-                                right: '0',
-                                top: '30px',
-                                padding: 0,
-                                margin: 0,
-                                transform: null
-                            },
-                            autoStyleContainer: false
-                        },
-                        from: {
-                            color: '#FFEA82'
-                        },
-                        to: {
-                            color: '#ED6A5A'
-                        },
-                        step: (state, bar) => {
-                            bar.setText(Math.round(bar.value() * 100) + ' %');
-                        }
-                    });
-
-                    bar.animate(1.0); // Number from 0.0 to 1.0
+                    console.log(parseInt(duration * 185));
                 });
             };
 
@@ -207,6 +184,7 @@
         // Create a non-dom allocated Audio element
         // Add a change event listener to the file input
     </script>
+
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
