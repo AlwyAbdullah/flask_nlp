@@ -7,12 +7,15 @@ import numpy as np
 import pandas as pd
 from pprint import pprint
 from fpdf import FPDF
+from rouge import Rouge
+
 
 #gensim
 import gensim
 import gensim.corpora as corpora
 from gensim.utils import simple_preprocess
 from gensim.summarization import summarize
+from gensim.models import CoherenceModel
 
 import nltk
 nltk.download('stopwords')
@@ -24,6 +27,8 @@ app = Flask(__name__, static_url_path='/static')
 def index():
     transcript = ""
     listTopic = ""
+    score= ""
+    coherenceScore = ""
     if request.method == "POST":
         print("FORM DATA RECEIVED")
 
@@ -86,7 +91,7 @@ def index():
                         text[idx] = r.recognize_google(audio, language="id-ID")
                         print('index: ', idx, 'Menit ke: ', int(val/60), '-' , urutan, ' : ', text[idx])
                     except LookupError:
-                            print("Sorry your voice is ugly")
+                            print("Sorry... there is error in the process")
         for idx, val in enumerate(text):
             text[idx] += '.'
 
@@ -95,9 +100,17 @@ def index():
 
         if radio == "Text Summarization":
             summarizedText = summarize(joinedText, ratio=0.2)
-            transcript = summarizedText
+            stringSummarize = ''.join(map(str, summarizedText))
+            stringSummarize = stringSummarize.replace('.', '.\n')
+            transcript = stringSummarize
             print('')
             print(transcript)
+
+            rouge = Rouge()
+            score = rouge.get_scores(summarizedText, joinedText, avg=True)
+            score = str(score)
+            score = score.replace('[', '').replace(']', '').replace("'", "").replace('{', '').replace('}', '').replace('r:', 'recall:').replace('p', 'precision').replace('f', 'Score')
+            print(score)
         else:
             from Sastrawi.StopWordRemover.StopWordRemoverFactory import StopWordRemoverFactory #Library for removing stopword
             from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
@@ -211,6 +224,11 @@ def index():
             pprint(lda_model.print_topics(10))
             doc_lda = lda_model[corpus]
 
+            # Compute Coherence Score
+            coherence_model_lda = CoherenceModel(model=lda_model, texts=data_words_nostops_text1_topic, dictionary=id2word, coherence='c_v')
+            coherence_lda = coherence_model_lda.get_coherence()
+            coherenceScore = coherence_lda
+
             listTopic = lda_model.print_topics(10)
             changeOrder = [9,8,7,6,5,4,3,2,1,0]
             listTopic = [listTopic[i] for i in changeOrder]
@@ -231,7 +249,7 @@ def index():
         path = os.path.join(app.root_path+'/static/audio/'+secure_filename(file.filename))
         # path = os.path.join(app.instance_path, 'uploads/'+secure_filename(file.filename))
         os.remove(path)
-    return render_template('text_summarization.html', transcript=transcript, listTopic=listTopic)
+    return render_template('text_summarization.html', transcript=transcript, listTopic=listTopic, score=score, coherenceScore=coherenceScore)
 
 
 @app.route('/test')

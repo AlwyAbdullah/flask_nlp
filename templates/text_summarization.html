@@ -36,6 +36,7 @@
             <h1 class="text-center mt-5">INSERT YOUR AUDIO FILE</h1>
             <a href="{{ url_for('test') }}"></a>
             <p class="text-center">Audio file must be wav</p>
+            <p class="text-center">Convert data type to wav <a href="https://cloudconvert.com/mp4-to-wav" target="_blank">click Here</a></p>
             <p class="text-center"><b>30 Minute audio 6 Minute Process</b></p>
             <span id="duration"></span>
             <form method="post" enctype="multipart/form-data" onsubmit="progressBar()">
@@ -71,6 +72,8 @@
 
             <div class="text-white">
                 {% if transcript != "" %}
+                <button class="btn btn-danger btn-block" onclick="toggleScore()">Show Score</button>
+                <p id="score" class="text-justify" style="display: none;">{{ score }}</p>
                 <h1 class="text-center"><b>Text Summarization</b></h1>
                 <p class="text-justify">{{ transcript }}</p>
                 <form action="{{ url_for('downloadPDF') }}" method="post" class="text-white container">
@@ -107,6 +110,8 @@
 
                 {% if listTopic %}
                 <div id="listTopic" class="text-center">
+                    <button class="btn btn-danger btn-block" onclick="toggleScore()">Show Score</button>
+                    <p id="score" style="display: none;">{{ coherenceScore }}</p>
                     <h1><b>Topic Modelling</b></h1>
                     <p>Topic 1: {{ listTopic[0] }}</p>
                     <p>Topic 2: {{ listTopic[1] }}</p>

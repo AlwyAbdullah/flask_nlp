@@ -51,6 +51,15 @@ function addFields() {
     }
 }
 
+function toggleScore(){
+    var x = document.getElementById("score");
+    if (x.style.display === "none") {
+        x.style.display = "block";
+    } else{
+        x.style.display = "none";
+    }
+}
+
 
 function progressBar() {
     console.log(duration);
