@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous" />
+    <link rel="stylesheet" type="text/css" href="../static/styles/main.css">
+    <title>Speech To Text</title>
+</head>
+
+<body class="container pt-5">
+    <h2 class="mt-4 text-light">Live Transciprt</h2>
+    <p id="speak" class="lead text-light" style="display: none;">Start Speaking...</p>
+    <form method="post" enctype="multipart/form-data">
+        <div class="p-3" style="border: 1px solid gray; height: 300px; border-radius: 8px;">
+            <span id="interim" class="text-secondary"></span>
+            <textarea class="form-control" id="final" name="formtextarea" rows="10" required></textarea>
+        </div>
+        <div class="mt-4">
+            <input type="button" class="btn btn-success" id="start" onclick="toggleLiveMic()" value="start"></input>
+            <input type="button" class="btn btn-danger" id="stop" onclick="toggleLiveMic()" value="stop"></input>
+            <p id="status" class="lead mt-3 text-light" style="display: none">Listenting ...</p>
+        </div>
+        <button type="submit" class="btn btn-primary mt-3 btn-block" id="submitButton">Transcribe</button>
+    </form>
+    {% if transcript  %}
+    <p>{{ transcript }}</p>
+    {% endif %}
+</body>
+<script src="../static/styles/speechRecognition.js"></script>
+<script src="../static/styles/language.js"></script>
+
+</html>

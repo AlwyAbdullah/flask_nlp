@@ -1,4 +1,6 @@
+from datetime import datetime
 from flask import Flask, render_template, request, redirect, make_response
+from matplotlib.pyplot import text
 import speech_recognition as sr
 from werkzeug.utils import secure_filename
 import os
@@ -8,6 +10,7 @@ import pandas as pd
 from pprint import pprint
 from fpdf import FPDF
 from rouge import Rouge
+import locale
 
 
 #gensim
@@ -18,8 +21,7 @@ from gensim.summarization import summarize
 from gensim.models import CoherenceModel
 
 import nltk
-nltk.download('stopwords')
-nltk.download('punkt')
+
 
 app = Flask(__name__, static_url_path='/static')
 
@@ -29,6 +31,8 @@ def index():
     listTopic = ""
     score= ""
     coherenceScore = ""
+    nltk.download('stopwords')
+    nltk.download('punkt')
     if request.method == "POST":
         print("FORM DATA RECEIVED")
 
@@ -256,8 +260,20 @@ def index():
 def test():
     return render_template('summarizePDF.html')
 
+@app.route('/liveMic', methods=["GET", "POST"])
+def liveMic():
+    transcript = ''
+    if request.method == "POST":
+        print("FORM DATA RECEIVED")
+        textarea = request.form["formtextarea"]
+        summarized_text = summarize(textarea, ratio=0.2)
+        print(summarized_text)
+        transcript = summarized_text
+    return render_template('liveMicTranscription.html', transcript=transcript)
+
 @app.route('/downloadPDF', methods=["POST", "GET"])
 def downloadPDF():
+    date_time_obj = ""
     if request.method == "POST":
         print("FORM DATA RECEIVED")
 
@@ -269,6 +285,9 @@ def downloadPDF():
         # select = request.form["formselect"]
         textarea = request.form["formtextarea"]
         tempat = request.form["tempat"]
+
+        date_time_obj = datetime.strptime(date, "%Y-%m-%d")
+        date_time_obj = date_time_obj.strftime("%d %B %Y")
 
         pdf = FPDF()
         pdf.add_page()
@@ -283,16 +302,16 @@ def downloadPDF():
 
         pdf.image("static/image/HeaderPDF.png",w=190, h=50)
 
-        pdf.cell(200, 10, txt = tempat + ", " +  date + "     ", ln = 10, align = 'R')
+        pdf.cell(195, 10, txt = tempat + ", " +  date_time_obj + "     ", ln = 10, align = 'R')
 
         pdf.cell(200, 10, txt = "Participant:", ln = 10, align = 'L')
 
         for x in range(int(participantNumber)):
-            if x == 1:
+            if x == 0:
                 pdf.set_font("Times", "B", size=12)
             else:
                 pdf.set_font("Times", size=12)
-                pdf.cell(200, 10, txt = name[x], ln = 10, align = 'L')
+            pdf.cell(200, 10, txt = name[x], ln = 10, align = 'L')
 
         # pdf.cell(200, 10, txt = name[0], ln = 10, align = 'L')
 
@@ -301,6 +320,14 @@ def downloadPDF():
 
         pdf.set_font("Times", size=12)
         pdf.multi_cell(190, 10, txt = textarea, align = 'J')
+
+        pdf.cell(195, 10, txt = tempat + ", " +  date_time_obj + "     ", ln = 10, align = 'R')
+        pdf.cell(180, 10, txt = "Ketua Rapat", ln=10, align='R')
+        pdf.ln()
+        pdf.ln()
+        pdf.ln()
+
+        pdf.cell(183, 10, txt = name[0], ln=40, align='R')
 
         response = make_response(pdf.output(dest='S').encode('latin-1'))
         response.headers.set('Content-Disposition', 'attachment', filename="Notulensi" + '.pdf')
