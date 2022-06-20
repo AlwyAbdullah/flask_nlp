@@ -263,13 +263,152 @@ def test():
 @app.route('/liveMic', methods=["GET", "POST"])
 def liveMic():
     transcript = ''
+    listTopic=''
+    coherenceScore=''
     if request.method == "POST":
         print("FORM DATA RECEIVED")
         textarea = request.form["formtextarea"]
-        summarized_text = summarize(textarea, ratio=0.2)
-        print(summarized_text)
-        transcript = summarized_text
-    return render_template('liveMicTranscription.html', transcript=transcript)
+        radio = request.form["radio"]
+        if radio == "Text Summarization":
+            summarized_text = summarize(textarea, ratio=0.2)
+            print(summarized_text)
+            transcript = summarized_text
+        else:
+            from Sastrawi.StopWordRemover.StopWordRemoverFactory import StopWordRemoverFactory #Library for removing stopword
+            from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
+
+            from nltk.stem import PorterStemmer
+
+
+            factory = StopWordRemoverFactory()
+            stopword = factory.create_stop_word_remover()
+
+            # create stemmer
+            factory = StemmerFactory()
+            stemmer = factory.create_stemmer()
+            porter = PorterStemmer()
+
+            # NLTK Stop words
+            from nltk.corpus import stopwords
+            stop_words = stopwords.words('indonesian')
+            stop_words.extend(['ya', 'gua', 'an', 'ancang', 'anggar', 'anti', 'arti', 'aston', 'arah', 'atus', 'bales', 'banget', 'bas', 'basic', 'bayang', 'bayi', 'be', 'belanja','bibi','biding', 'bill', 'bos', 'bunda',
+                            'cek', 'isi', 'iya', 'jagain', 'jaga', 'jual', 'juang', 'jurus', 'jam', 'kastem', 'kali', 'hendra', 'henti', 'kain' 'febby', 'flanel', 'ganti', 'guling', 'habis', 'hadis', 'halo', 'han',
+                            'hantam', 'harap', 'harga' 'cakap', 'coc', 'cocok', 'diarsi', 'dika', 'eko', 'elemen', 'enak', 'assalamualaikum', 'warahmatullahi', 'abang', 'waalaikumsalam',	'wakil', 'usul', 'utama',
+                            'utara',	'warahmatullah',	'wawancara',	'whatsapp',	'wi',	'word	','zaman', 'acara', 'adab', 'adik', 'yuk', 'agam', 'wajib', 'mbak', 'pak', 'nggih', 'wabarakatuh', 'selamat', 'siang', 'pagi',
+                            'malam', 'pijit','pikir','perangkat','perhati','perilaku', 'permata', 'persen', 'peter', 'pokok', 'gitu', 'nggak', 'sih', 'bener', 'ajak', 'anak', 'ajar', 'nama', 'kayak', 'pakai', 'masuk', 'mata',
+                            'orang', 'nya', 'aja', 'kasih', 'kait', 'tulis', 'web', 'gin', 'temen', 'bu', 'sesuai', 'kenal', 'beda', 'bikin', 'salah', 'laku', 'terima', 'kalah', 'kaya', 'kedip', 'kelulus', 'kemarin', 'kembang', 'kerjain',
+                            'kuning', 'kuningan', 'lari', 'latar', 'latih', 'lempar', 'lunak', 'album', 'maju', 'makan', 'makasih', 'maksud', 'mas', 'mateng', 'mentingin', 'menteri',
+                            'merah', 'mi', 'mobil', 'monggo', 'mpasi', 'mulut', 'muncul', 'naksir', 'ngerjain', 'ngerti', 'ngomong', 'ngomongnya', 'nih', 'nomor', 'nota', 'nyetting', 'objek', 'nyata',
+                            'of', 'oke', 'on', 'operasi', 'operasional', 'oriented', 'pemograman', 'pendi', 'penuh', 'peran', 'pilih', 'pimpin', 'pisah', 'pln', 'poin', 'pusing', 'pribadi',
+                            'presales', 'pritil', 'pusing', 'putus', 'raba', 'ranaya', 'ranah', 'ranting', 'read', 'real', 'rendah', 'rendi','ritme', 'rp', 'rpl', 'rumah', 'ruang', 'rumpun', 'rumput',
+                            'salam', 'sanding', 'saran', 'sebentar', 'selebriti', 'semprot', 'sesi', 'sit', 'siti', 'situ', 'sopir', 'sorry', 'standart', 'sulam', 'sulis', 'susu', 'susun', 'tablu',
+                            'takut', 'tambal', 'tanda', 'tangan', 'tantang', 'tarik', 'tato', 'tau', 'tdd', 'tembok', 'temu', 'tenda', 'tik', 'terap', 'titik', 'tok', 'tolong', 'tuh', 'tuju', 'tunda',
+                            'udah', 'up', 'upda', 'urus' 'usernya', 'analis', 'analisa', 'analisis', 'bagus', 'bahas', 'bappenas', 'barangkali', 'batas', 'bekal', 'benah', 'benang', 'biar', 'brainly', 'cari', 'contoh',
+                            'cuman', 'batang', 'beliau', 'bentuk', 'db', 'dbms', 'diassign', 'ah', 'ahli', 'ajarin', 'alya', 'analitik', 'analyst', 'and', 'andi', 'sila', 'aren', 'bk', 'bpk', 'buah', 'ci',
+                            'codingannya', 'crv', 'dateng', 'dede', 'detil', 'dijadiin', 'dinas', 'disimpen', 'dorong', 'dot', 'edi', 'entar', 'etl', 'febby', 'fi', 'gang', 'hadits', 'hit', 'hilang', 'if', 'ikan', 'ikhtiar',
+                            'in', 'intan', 'ips', 'istri', 'ji', 'kadang', 'kaget', 'kain', 'kena', 'ketemu', 'ketes', 'lho', 'letak', 'life', 'lukman', 'lupa', 'mc', 'millions', 'miss', 'nambah', 'nembak', 'ngajar', 'nikah', 'nokia',
+                            'obeng', 'nyanyi', 'paku', 'palu', 'papi', 'pms', 'pentest', 'primbon', 'pulsa', 'rezeki', 'riak', 'rian', 'roti', 'sali', 'sambut', 'sebenernya', 'segitu', 'sederhana', 'sekian', 'sisa', 'slimenya', 'socket', 'soft',
+                            'sydney', 'stringstream', 'tablo', 'tampil', 'tanah', 'teteh', 'tv', 'urus'])
+
+
+            # Define functions for stopwords, bigrams, trigrams and lemmatization
+            def remove_stopwords(texts):
+                return [[word for word in simple_preprocess(str(doc)) if word not in stop_words] for doc in texts]
+
+            def make_bigrams(texts):
+                return [bigram_mod[doc] for doc in texts]
+
+            def make_trigrams(texts):
+                return [trigram_mod[bigram_mod[doc]] for doc in texts]
+
+            # Stemming indonesia dan inggris
+            eng_stem_text1_topic = porter.stem(textarea)
+            text1_topic_stem = stemmer.stem(eng_stem_text1_topic)
+            text1_topic_stopwords_sastrawi = stopword.remove(text1_topic_stem)
+            print(len(text1_topic_stem))
+            print(len(text1_topic_stopwords_sastrawi))
+
+            # Change to list
+            list_word_topic = [(text1_topic_stopwords_sastrawi.strip())]
+            print(list_word_topic)
+
+            # Remove Stopwords
+            data_words_nostops_text1_topic = remove_stopwords(list_word_topic)
+            print(data_words_nostops_text1_topic)
+
+            # Build the bigram and trigram models (Bigram adalah 2 kata sedangkan Trigram adalah 3 kata)
+            bigram = gensim.models.Phrases(data_words_nostops_text1_topic, min_count=5, threshold=100) # higher threshold fewer phrases.
+            trigram = gensim.models.Phrases(bigram[data_words_nostops_text1_topic], threshold=100)
+
+            # Faster way to get a sentence clubbed as a trigram/bigram
+            bigram_mod = gensim.models.phrases.Phraser(bigram)
+            trigram_mod = gensim.models.phrases.Phraser(trigram)
+
+            # See trigram example
+            # print(trigram_mod[bigram_mod[data_words[0]]])
+            print(trigram_mod[bigram_mod[data_words_nostops_text1_topic[0]]])
+
+            # Create Dictionary
+            id2word = corpora.Dictionary(data_words_nostops_text1_topic)
+
+            # Create Corpus
+            texts = data_words_nostops_text1_topic
+
+            # Term Document Frequency
+            corpus = [id2word.doc2bow(text1) for text1 in texts]
+
+            # View
+            print(corpus[:1])
+
+            [[(id2word[id], freq) for id, freq in cp] for cp in corpus[:1]]
+
+            # Build LDA model
+            lda_model = gensim.models.ldamodel.LdaModel(corpus=corpus,
+                                                    id2word=id2word,
+                                                    num_topics=100,
+                                                    random_state=100,
+                                                    update_every=1,
+                                                    chunksize=2000,
+                                                    passes=10,
+                                                    alpha='auto',
+                                                    per_word_topics=True)
+
+            # Print the Keyword in the topics
+            # pprint(lda_model.print_topics(1))
+            # doc_lda = lda_model[corpus]
+
+            # topic = lda_model.print_topics(1)
+            # stringTopic = ' '.join(map(str, topic))
+            # stringTopic = ''.join(i for i in stringTopic if not i.isdigit())
+            # stringTopic = stringTopic.replace("'", '').replace(",", '').replace("*", '').replace(".", '').replace('"', '').replace("(", '').replace(")", '').replace("+", ",")
+            # print(stringTopic)
+
+            pprint(lda_model.print_topics(5))
+            doc_lda = lda_model[corpus]
+
+            # Compute Coherence Score
+            coherence_model_lda = CoherenceModel(model=lda_model, texts=data_words_nostops_text1_topic, dictionary=id2word, coherence='c_v')
+            coherence_lda = coherence_model_lda.get_coherence()
+            coherenceScore = coherence_lda
+
+            listTopic = lda_model.print_topics(5)
+            changeOrder = [4,3,2,1,0]
+            listTopic = [listTopic[i] for i in changeOrder]
+
+            for n in range(5):
+                print('Topic ', n+1, ' :', listTopic[n])
+                listTopic[n] =listTopic[n]
+
+            print(listTopic)
+            stringTopic = ' '.join(map(str, listTopic))
+            stringTopic = ''.join(i for i in stringTopic if not i.isdigit())
+            stringTopic = stringTopic.replace("'", '').replace(",", '').replace("*", '').replace(".", '').replace('"', '').replace("(", '').replace(")", '\n').replace(" ", "").replace("+", ', ')
+            print(stringTopic)
+            arrayTopic = stringTopic.split("\n")
+
+            listTopic = arrayTopic
+
+    return render_template('liveMicTranscription.html', transcript=transcript, listTopic=listTopic, coherenceScore=coherenceScore)
 
 @app.route('/downloadPDF', methods=["POST", "GET"])
 def downloadPDF():
