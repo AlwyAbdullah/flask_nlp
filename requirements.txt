@@ -1,6 +1,6 @@
-pip install sastrawi
+pip install Sastrawi
 pip install SpeechRecognition
-pip install FPDF
+pip install fpdf
 pip install rouge
 pip install gensim
 pip install nltk
