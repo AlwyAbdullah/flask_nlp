@@ -65,7 +65,9 @@
             <button type="submit" class="btn btn-primary mt-3 btn-block" id="submitButton">Transcribe</button>
         </form>
         {% if transcript  %}
-        <div class="text-light">
+        <div class="text-light mt-3">
+            <button class="btn btn-danger btn-block" onclick="toggleScore()">Show Score</button>
+            <p id="score" class="text-justify" style="display: none;">{{ score }}</p>
             <h1 class="text-center">Kesimpulan</h1>
             <p>{{ transcript }}</p>
         </div>

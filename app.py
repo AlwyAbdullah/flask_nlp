@@ -265,14 +265,21 @@ def liveMic():
     transcript = ''
     listTopic=''
     coherenceScore=''
+    score=''
     if request.method == "POST":
         print("FORM DATA RECEIVED")
         textarea = request.form["formtextarea"]
         radio = request.form["radio"]
         if radio == "Text Summarization":
-            summarized_text = summarize(textarea, ratio=0.2)
+            summarized_text = summarize(textarea, ratio=0.4)
             print(summarized_text)
             transcript = summarized_text
+
+            rouge = Rouge()
+            score = rouge.get_scores(summarized_text, textarea, avg=True)
+            score = str(score)
+            score = score.replace('[', '').replace(']', '').replace("'", "").replace('{', '').replace('}', '').replace('r:', 'recall:').replace('p', 'precision').replace('f', 'Score')
+            print(score)
         else:
             from Sastrawi.StopWordRemover.StopWordRemoverFactory import StopWordRemoverFactory #Library for removing stopword
             from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
@@ -408,7 +415,7 @@ def liveMic():
 
             listTopic = arrayTopic
 
-    return render_template('liveMicTranscription.html', transcript=transcript, listTopic=listTopic, coherenceScore=coherenceScore)
+    return render_template('liveMicTranscription.html', transcript=transcript, listTopic=listTopic, coherenceScore=coherenceScore, score=score)
 
 @app.route('/downloadPDF', methods=["POST", "GET"])
 def downloadPDF():
