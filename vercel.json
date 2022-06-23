@@ -3,7 +3,7 @@
     "builds": [
         {
             "src": "*.py",
-            "use": "@AlwyAbdullah/flask-nlp"
+            "use": "@AlwyAbdullah/flask_nlp"
         }
     ],
     "routes": [
