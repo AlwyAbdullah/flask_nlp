@@ -1,0 +1,15 @@
+{
+    "version": 2,
+    "builds": [
+        {
+            "src": "*.py",
+            "use": "@AlwyAbdullah/flask-nlp"
+        }
+    ],
+    "routes": [
+        {
+            "src": "(.*)",
+            "dest": "app.py"
+        }
+    ]
+  }
