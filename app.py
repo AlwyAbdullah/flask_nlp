@@ -22,6 +22,8 @@ from gensim.models import CoherenceModel
 
 import nltk
 
+nltk.download('stopwords')
+# nltk.download('punkt')
 
 app = Flask(__name__, static_url_path='/static')
 
@@ -31,8 +33,6 @@ def index():
     listTopic = ""
     score= ""
     coherenceScore = ""
-    nltk.download('stopwords')
-    nltk.download('punkt')
     if request.method == "POST":
         print("FORM DATA RECEIVED")
 
@@ -90,8 +90,8 @@ def index():
                     else:
                         c = 180
                         urutan = int((val/60)+3)
+                    audio = r.record(source, offset=val, duration=c)
                     try:
-                        audio = r.record(source, offset=val, duration=c)
                         text[idx] = r.recognize_google(audio, language="id-ID")
                         print('index: ', idx, 'Menit ke: ', int(val/60), '-' , urutan, ' : ', text[idx])
                     except LookupError:
@@ -150,7 +150,7 @@ def index():
                             'codingannya', 'crv', 'dateng', 'dede', 'detil', 'dijadiin', 'dinas', 'disimpen', 'dorong', 'dot', 'edi', 'entar', 'etl', 'febby', 'fi', 'gang', 'hadits', 'hit', 'hilang', 'if', 'ikan', 'ikhtiar',
                             'in', 'intan', 'ips', 'istri', 'ji', 'kadang', 'kaget', 'kain', 'kena', 'ketemu', 'ketes', 'lho', 'letak', 'life', 'lukman', 'lupa', 'mc', 'millions', 'miss', 'nambah', 'nembak', 'ngajar', 'nikah', 'nokia',
                             'obeng', 'nyanyi', 'paku', 'palu', 'papi', 'pms', 'pentest', 'primbon', 'pulsa', 'rezeki', 'riak', 'rian', 'roti', 'sali', 'sambut', 'sebenernya', 'segitu', 'sederhana', 'sekian', 'sisa', 'slimenya', 'socket', 'soft',
-                            'sydney', 'stringstream', 'tablo', 'tampil', 'tanah', 'teteh', 'tv', 'urus'])
+                            'sydney', 'stringstream', 'tablo', 'tampil', 'tanah', 'teteh', 'tv', 'urus', 'lu', 'papa'])
 
 
             # Define functions for stopwords, bigrams, trigrams and lemmatization

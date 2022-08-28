@@ -1,7 +1,9 @@
 body {
-    background-image: url('../image/background.png');
+    background-image: url('../image/cool-background.png'); /* for topic modelling */
+    /* background-image: url('../image/background.png'); for text summarization */
     background-repeat: no-repeat;
     background-attachment: fixed;
+    background-size: 100%;
 }
 
 #container{

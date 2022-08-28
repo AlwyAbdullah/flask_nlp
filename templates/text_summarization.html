@@ -33,6 +33,10 @@
 
 <body>
 
+    {% if listTopic %}
+    <img src="../static/image/cool-background.png" alt="">
+    {% endif %}
+
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <a class="navbar-brand" href="/">Text Summarization</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
@@ -57,7 +61,7 @@
             <a href="{{ url_for('test') }}"></a>
             <p class="text-center">Audio file must be wav</p>
             <p class="text-center">Convert data type to wav <a href="https://cloudconvert.com/mp4-to-wav"
-                    target="_blank">click Here</a></p>
+                    target="_blank" class="text-dark">click Here</a></p>
             <p class="text-center"><b>30 Minute audio 6 Minute Process</b></p>
             <span id="duration"></span>
             <form method="post" enctype="multipart/form-data" onsubmit="progressBar()">
